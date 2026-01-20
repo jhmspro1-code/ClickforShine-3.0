@@ -11,39 +11,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
+      - uses: subosito/flutter-action@v2
         with:
           flutter-version: "3.16.0"
           channel: stable
 
-      - name: Ensure Dart SDK constraint (safe)
-        run: |
-          if ! grep -q "^environment:" pubspec.yaml; then
-            echo "" >> pubspec.yaml
-            echo "environment:" >> pubspec.yaml
-            echo "  sdk: \">=3.0.0 <4.0.0\"" >> pubspec.yaml
-          elif ! grep -q "sdk:" pubspec.yaml; then
-            sed -i '/^environment:/a\  sdk: ">=3.0.0 <4.0.0"' pubspec.yaml
-          fi
+      - run: flutter clean
+      - run: flutter pub get
+      - run: flutter build apk --release
 
-          echo "===== pubspec.yaml (final) ====="
-          cat pubspec.yaml
-
-      - name: Flutter clean
-        run: flutter clean
-
-      - name: Get dependencies
-        run: flutter pub get
-
-      - name: Build APK
-        run: flutter build apk --release
-
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: app-release
           path: build/app/outputs/flutter-apk/app-release.apk
