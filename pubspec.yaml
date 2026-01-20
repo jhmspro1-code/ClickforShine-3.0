@@ -1,23 +1,12 @@
-name: clickforshine
-description: ClickForShine Flutter App
-publish_to: "none"
-
-version: 1.0.0+1
-
-environment:
-  sdk: ">=3.0.0 <4.0.0"
-
-dependencies:
-  flutter:
-    sdk: flutter
-
-  cupertino_icons: ^1.0.6
-
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-
-  flutter_lints: ^3.0.0
-
-flutter:
-  uses-material-design: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      DART_VM_OPTIONS: "--old_gen_heap_size=4096" # Aumenta memória da Dart VM
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+      - run: flutter pub get
+      - run: flutter build apk --release
