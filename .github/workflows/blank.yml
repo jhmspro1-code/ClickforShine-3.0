@@ -20,14 +20,17 @@ jobs:
           flutter-version: "3.16.0"
           channel: stable
 
-      - name: Force Dart SDK constraint in pubspec.yaml
+      - name: Ensure Dart SDK constraint (safe)
         run: |
-          if ! grep -q "environment:" pubspec.yaml; then
-            sed -i '1ienvironment:\n  sdk: ">=3.0.0 <4.0.0"\n' pubspec.yaml
-          else
-            sed -i '/environment:/,/sdk:/c\environment:\n  sdk: ">=3.0.0 <4.0.0"' pubspec.yaml
+          if ! grep -q "^environment:" pubspec.yaml; then
+            echo "" >> pubspec.yaml
+            echo "environment:" >> pubspec.yaml
+            echo "  sdk: \">=3.0.0 <4.0.0\"" >> pubspec.yaml
+          elif ! grep -q "sdk:" pubspec.yaml; then
+            sed -i '/^environment:/a\  sdk: ">=3.0.0 <4.0.0"' pubspec.yaml
           fi
-          echo "===== pubspec.yaml after fix ====="
+
+          echo "===== pubspec.yaml (final) ====="
           cat pubspec.yaml
 
       - name: Flutter clean
