@@ -27,5 +27,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ClickForShine-Instalador
-          # O segredo está aqui: ele busca em qualquer pasta o arquivo .apk
-          path: "*/.apk"
+          # Busca universal que garante que o artefato apareça
+          path: "*/build/app/outputs/flutter-apk/.apk"
