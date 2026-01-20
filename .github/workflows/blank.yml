@@ -1,28 +1,12 @@
-name: Flutter Build
-
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    env:
+      DART_VM_OPTIONS: "--old_gen_heap_size=4096" # Aumenta memória da Dart VM
     steps:
       - uses: actions/checkout@v4
-
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.16.0"
-          channel: stable
-
-      - run: flutter clean
+          channel: 'stable'
       - run: flutter pub get
       - run: flutter build apk --release
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: app-release
-          path: build/app/outputs/flutter-apk/app-release.apk
