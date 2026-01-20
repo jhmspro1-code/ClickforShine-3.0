@@ -1,4 +1,4 @@
-name: ClickForShine-Resgate
+name: ClickForShine-Final-Build
 on:
   push:
     branches: [ main ]
@@ -6,26 +6,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: 1-checkout
+      - name: 1-clone-code
         uses: actions/checkout@v4
-      - name: 2-java
+      - name: 2-setup-java
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
-      - name: 3-flutter
+      - name: 3-setup-flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-      - name: 4-build
+      - name: 4-force-build
         run: |
           cd clickforshine_3.0
           flutter pub get
           chmod +x android/gradlew
           flutter build apk --release
-      - name: 5-upload
+      - name: 5-find-and-save-apk
         uses: actions/upload-artifact@v4
         with:
-          name: ClickForShine-App
-          # O segredo: buscar o APK em qualquer subpasta automaticamente
-          path: "**/app-release.apk"
+          name: ClickForShine-Instalador
+          # O radar que não falha: busca o apk em qualquer lugar
+          path: "*/build/app/outputs/flutter-apk/.apk"
