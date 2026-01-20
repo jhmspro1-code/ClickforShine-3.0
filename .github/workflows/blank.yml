@@ -1,31 +1,40 @@
-name: ClickForShine-Final-Build
+name: ClickForShine-Push-Back
 on:
   push:
     branches: [ main ]
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: 1-clone-code
+      - name: 1-checkout
         uses: actions/checkout@v4
-      - name: 2-setup-java
+
+      - name: 2-java-setup
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
-      - name: 3-setup-flutter
+
+      - name: 3-flutter-setup
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-      - name: 4-force-build
+
+      - name: 4-build-apk
         run: |
           cd clickforshine_3.0
           flutter pub get
           chmod +x android/gradlew
           flutter build apk --release
-      - name: 5-find-and-save-apk
-        uses: actions/upload-artifact@v4
-        with:
-          name: ClickForShine-Instalador
-          # O radar que não falha: busca o apk em qualquer lugar
-          path: "*/build/app/outputs/flutter-apk/.apk"
+
+      - name: 5-push-to-repository
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          # Copia o APK para a raiz para o Manus enxergar fácil
+          cp clickforshine_3.0/build/app/outputs/flutter-apk/app-release.apk ./clickforshine-final.apk
+          git add clickforshine-final.apk
+          git commit -m "📦 APK gerado automaticamente pelo Build"
+          git push
