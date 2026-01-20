@@ -1,40 +1,4 @@
-name: ClickForShine-Final-Manual
-
-on:
-  push:
-    branches: [ main ]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 1-checkout
-        uses: actions/checkout@v4
-
-      - name: 2-java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: 3-flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
-      - name: 4-fix-and-build
+- name: 4-build-force
         run: |
-          # Comando "mágico" para inserir a versão do SDK no pubspec.yaml caso ela falte
-          sed -i '1i environment:\n  sdk: ">=3.0.0 <4.0.0"' pubspec.yaml
-          
-          flutter clean
           flutter pub get
-          chmod +x android/gradlew
-          flutter build apk --release
-
-      - name: 5-upload-artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ClickForShine-Instalador
-          path: build/app/outputs/flutter-apk/app-release.apk
+          flutter build apk --force
