@@ -1,23 +1,46 @@
-name: clickforshine
-description: App ClickForShine
-publish_to: "none"
+name: Flutter Build
 
-version: 1.0.0+1
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-environment:
-  sdk: ">=3.0.0 <4.0.0"
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-dependencies:
-  flutter:
-    sdk: flutter
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  cupertino_icons: ^1.0.6
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.16.0"
+          channel: stable
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
+      - name: Force Dart SDK constraint in pubspec.yaml
+        run: |
+          if ! grep -q "environment:" pubspec.yaml; then
+            sed -i '1ienvironment:\n  sdk: ">=3.0.0 <4.0.0"\n' pubspec.yaml
+          else
+            sed -i '/environment:/,/sdk:/c\environment:\n  sdk: ">=3.0.0 <4.0.0"' pubspec.yaml
+          fi
+          echo "===== pubspec.yaml after fix ====="
+          cat pubspec.yaml
 
-  flutter_lints: ^3.0.0
+      - name: Flutter clean
+        run: flutter clean
 
-flutter:
-  uses-material-design: true
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release
+          path: build/app/outputs/flutter-apk/app-release.apk
