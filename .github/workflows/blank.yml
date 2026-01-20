@@ -22,18 +22,15 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-          # Isso garante que a versão do Flutter seja compatível com o projeto
-          flutter-version: '3.10.0' 
 
-      - name: 4-build-force
+      - name: 4-fix-and-build
         run: |
-          # Limpa caches antigos que podem causar conflito
+          # Comando "mágico" para inserir a versão do SDK no pubspec.yaml caso ela falte
+          sed -i '1i environment:\n  sdk: ">=3.0.0 <4.0.0"' pubspec.yaml
+          
           flutter clean
-          # Tenta baixar as dependências
           flutter pub get
-          # Garante permissão no Gradle
           chmod +x android/gradlew
-          # Build do APK
           flutter build apk --release
 
       - name: 5-upload-artifact
